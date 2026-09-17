@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RPS — ALWAYS WIN</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  :root {
+    --navy: #0F2854;
+    --blue-medium: #1C4D8D;
+    --blue-light: #4988C4;
+    --sky-pale: #BDE8F5;
+    --white: #FFFFFF;
+  }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, var(--navy) 0%, var(--blue-medium) 100%);
+    color: var(--white);
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .page-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 28px;
+  }
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    letter-spacing: 2px;
+    color: var(--sky-pale);
+    margin-bottom: 6px;
+    text-shadow: 0 0 20px rgba(189, 232, 245, 0.3);
+  }
+  .subtitle {
+    color: var(--sky-pale);
+    opacity: 0.8;
+    font-size: 1rem;
+  }
+  .video-shell {
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow:
+      0 0 0 2px var(--blue-light),
+      0 0 50px rgba(73, 136, 196, 0.3),
+      inset 0 0 60px rgba(15, 40, 84, 0.6);
+    background: var(--navy);
+  }
+  video, canvas {
+    width: 100%;
+    height: auto;
+    display: block;
+    transform: scaleX(-1);
+  }
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+  }
+  .ui-layer {
+    position: absolute;
+    inset: 0;
+    padding: 24px;
+    pointer-events: none;
+  }
+  .card {
+    backdrop-filter: blur(12px);
+    background: rgba(28, 77, 141, 0.75);
+    border-radius: 16px;
+    border: 2px solid var(--blue-light);
+    box-shadow: 0 8px 32px rgba(15, 40, 84, 0.5);
+    padding: 20px 24px;
+    transition: all 0.4s ease;
+  }
+  .you-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-left: 4px solid var(--sky-pale);
+  }
+  .ai-card {
+    position: absolute;
+    top: 50%;
+    right: 0;
+    transform: translateY(-50%);
+    text-align: center;
+    border-right: 4px solid var(--sky-pale);
+    min-width: 200px;
+  }
+  .result-card {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    border-left: 4px solid var(--sky-pale);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.4s ease;
+  }
+  .result-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--sky-pale);
+    margin-bottom: 6px;
+    font-weight: 600;
+    opacity: 0.9;
+  }
+  .value {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--white);
+  }
+  .value.waiting {
+    color: var(--sky-pale);
+    opacity: 0.6;
+    font-size: 1.4rem;
+  }
+  .instructions {
+    margin-top: 28px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .instr-card {
+    background: rgba(73, 136, 196, 0.25);
+    border-radius: 12px;
+    padding: 16px 24px;
+    text-align: center;
+    border: 2px solid var(--blue-light);
+    min-width: 110px;
+    transition: transform 0.3s ease;
+  }
+  .instr-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--sky-pale);
+  }
+  .instr-emoji {
+    font-size: 2rem;
+    margin-bottom: 4px;
+  }
+  .instr-text {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--sky-pale);
+  }
+  .status-badge {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    background: rgba(189, 232, 245, 0.15);
+    color: var(--sky-pale);
+    padding: 8px 16px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    border: 1px solid var(--sky-pale);
+  }
+  .status-badge::before {
+    content: '●';
+    margin-right: 6px;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  @media (max-width: 768px) {
+    .ui-layer { padding: 12px; }
+    .card { padding: 12px 16px; }
+    .value { font-size: 1.3rem; }
+    .ai-card { min-width: 140px; }
+    .instructions { gap: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="page-wrap">
+  <header>
+    <h1>✊✋✌️ RPS — ALWAYS WIN</h1>
+    <p class="subtitle">Show your hand → AI instantly plays the winning move</p>
+  </header>
+
+  <div class="video-shell">
+    <video id="video" autoplay playsinline muted></video>
+    <canvas id="canvas"></canvas>
+    <div class="ui-layer">
+      <div class="status-badge">LIVE</div>
+      
+      <div class="card you-card">
+        <div class="label">Your Move</div>
+        <div class="value waiting" id="yourMove">Waiting…</div>
+      </div>
+      
+      <div class="card ai-card">
+        <div class="label">AI Plays</div>
+        <div class="value waiting" id="aiMove">—</div>
+      </div>
+      
+      <div class="card result-card" id="resultCard">
+        <div class="label">Result</div>
+        <div class="value" id="resultText" style="font-size: 1.2rem;"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <div class="instr-card">
+      <div class="instr-emoji">✊</div>
+      <div class="instr-text">Rock</div>
+    </div>
+    <div class="instr-card">
+      <div class="instr-emoji">✋</div>
+      <div class="instr-text">Paper</div>
+    </div>
+    <div class="instr-card">
+      <div class="instr-emoji">✌️</div>
+      <div class="instr-text">Scissors</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+<script>
+const BEATS = { ROCK: 'PAPER', PAPER: 'SCISSORS', SCISSORS: 'ROCK' };
+
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+const yourMoveEl = document.getElementById('yourMove');
+const aiMoveEl = document.getElementById('aiMove');
+const resultCard = document.getElementById('resultCard');
+const resultText = document.getElementById('resultText');
+
+let lastMove = '';
+let stableStart = 0;
+const STABLE_DELAY = 500;
+
+function classifyGesture(landmarks) {
+  const tip = [4, 8, 12, 16, 20];
+  const pip = [3, 6, 10, 14, 18];
+  const fingersUp = [];
+  for (let i = 1; i < 5; i++) {
+    fingersUp.push(landmarks[tip[i]].y < landmarks[pip[i]].y);
+  }
+  if (!fingersUp.some(f => f)) return 'ROCK';
+  if (fingersUp.every(f => f)) return 'PAPER';
+  if (fingersUp[0] && fingersUp[1] && !fingersUp[2] && !fingersUp[3]) return 'SCISSORS';
+  return 'UNKNOWN';
+}
+
+async function init() {
+  const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+  video.srcObject = stream;
+  await new Promise(r => video.onloadedmetadata = r);
+  
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+
+  const hands = new Hands({
+    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+  });
+  hands.setOptions({
+    maxNumHands: 1,
+    modelComplexity: 1,
+    minDetectionConfidence: 0.7,
+    minTrackingConfidence: 0.6
+  });
+  hands.onResults(onResults);
+
+  async function processFrame() {
+    await hands.send({ image: video });
+    requestAnimationFrame(processFrame);
+  }
+  processFrame();
+}
+
+function onResults(results) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  let yourMove = 'NO HAND';
+  
+  if (results.multiHandLandmarks) {
+    for (const landmarks of results.multiHandLandmarks) {
+      drawConnectors(ctx, landmarks, HAND_CONNECTIONS, {
+        color: '#BDE8F5',
+        lineWidth: 3
+      });
+      drawLandmarks(ctx, landmarks, {
+        color: '#4988C4',
+        lineWidth: 2,
+        radius: 5
+      });
+      
+      const gesture = classifyGesture(landmarks);
+      if (gesture !== 'UNKNOWN') yourMove = gesture;
+    }
+  }
+
+  if (yourMove !== lastMove) {
+    lastMove = yourMove;
+    stableStart = Date.now();
+    resultCard.classList.remove('visible');
+  } else if (Date.now() - stableStart > STABLE_DELAY && BEATS[yourMove]) {
+    const aiMove = BEATS[yourMove];
+    yourMoveEl.textContent = yourMove;
+    yourMoveEl.classList.remove('waiting');
+    aiMoveEl.textContent = aiMove;
+    aiMoveEl.classList.remove('waiting');
+    resultText.textContent = `${aiMove} beats ${yourMove}`;
+    resultCard.classList.add('visible');
+    return;
+  }
+
+  yourMoveEl.textContent = yourMove === 'NO HAND' ? 'Waiting…' : yourMove;
+  yourMoveEl.classList.toggle('waiting', yourMove === 'NO HAND');
+  aiMoveEl.textContent = '—';
+  aiMoveEl.classList.add('waiting');
+}
+
+function drawConnectors(ctx, landmarks, connections, opts) {
+  ctx.strokeStyle = opts.color;
+  ctx.lineWidth = opts.lineWidth;
+  ctx.lineCap = 'round';
+  for (const [a, b] of connections) {
+    ctx.beginPath();
+    ctx.moveTo(landmarks[a].x * canvas.width, landmarks[a].y * canvas.height);
+    ctx.lineTo(landmarks[b].x * canvas.width, landmarks[b].y * canvas.height);
+    ctx.stroke();
+  }
+}
+
+function drawLandmarks(ctx, landmarks, opts) {
+  ctx.fillStyle = opts.color;
+  for (const lm of landmarks) {
+    ctx.beginPath();
+    ctx.arc(lm.x * canvas.width, lm.y * canvas.height, opts.radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+}
+
+init().catch(err => {
+  alert('Camera access required! Please allow camera permissions. ' + err.message);
+});
+</script>
+</body>
+</html>
