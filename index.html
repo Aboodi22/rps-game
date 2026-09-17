@@ -3,10 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPS — ALWAYS WIN</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+<title>RPS — ABDELL ALWAYS WIN</title>
 <style>
   * {
     margin: 0;
@@ -21,7 +18,7 @@
     --white: #FFFFFF;
   }
   body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     background: linear-gradient(135deg, var(--navy) 0%, var(--blue-medium) 100%);
     color: var(--white);
     min-height: 100vh;
@@ -33,20 +30,27 @@
   }
   header {
     text-align: center;
-    margin-bottom: 28px;
+    margin-bottom: 32px;
   }
   h1 {
     font-size: clamp(2rem, 5vw, 3.2rem);
     font-weight: 900;
     letter-spacing: 2px;
     color: var(--sky-pale);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
     text-shadow: 0 0 20px rgba(189, 232, 245, 0.3);
   }
   .subtitle {
     color: var(--sky-pale);
-    opacity: 0.8;
-    font-size: 1rem;
+    opacity: 0.85;
+    font-size: 1.1rem;
+    line-height: 1.6;
+  }
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 4fr;
+    gap: 24px;
+    align-items: start;
   }
   .video-shell {
     position: relative;
@@ -70,108 +74,18 @@
     left: 0;
     pointer-events: none;
   }
-  .ui-layer {
-    position: absolute;
-    inset: 0;
-    padding: 24px;
-    pointer-events: none;
-  }
-  .card {
-    backdrop-filter: blur(12px);
-    background: rgba(28, 77, 141, 0.75);
-    border-radius: 16px;
-    border: 2px solid var(--blue-light);
-    box-shadow: 0 8px 32px rgba(15, 40, 84, 0.5);
-    padding: 20px 24px;
-    transition: all 0.4s ease;
-  }
-  .you-card {
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-left: 4px solid var(--sky-pale);
-  }
-  .ai-card {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    text-align: center;
-    border-right: 4px solid var(--sky-pale);
-    min-width: 200px;
-  }
-  .result-card {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    border-left: 4px solid var(--sky-pale);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.4s ease;
-  }
-  .result-card.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .label {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--sky-pale);
-    margin-bottom: 6px;
-    font-weight: 600;
-    opacity: 0.9;
-  }
-  .value {
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: var(--white);
-  }
-  .value.waiting {
-    color: var(--sky-pale);
-    opacity: 0.6;
-    font-size: 1.4rem;
-  }
-  .instructions {
-    margin-top: 28px;
-    display: flex;
-    justify-content: center;
-    gap: 24px;
-    flex-wrap: wrap;
-  }
-  .instr-card {
-    background: rgba(73, 136, 196, 0.25);
-    border-radius: 12px;
-    padding: 16px 24px;
-    text-align: center;
-    border: 2px solid var(--blue-light);
-    min-width: 110px;
-    transition: transform 0.3s ease;
-  }
-  .instr-card:hover {
-    transform: translateY(-4px);
-    border-color: var(--sky-pale);
-  }
-  .instr-emoji {
-    font-size: 2rem;
-    margin-bottom: 4px;
-  }
-  .instr-text {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--sky-pale);
-  }
   .status-badge {
     position: absolute;
-    top: 24px;
-    right: 24px;
+    top: 20px;
+    right: 20px;
     background: rgba(189, 232, 245, 0.15);
     color: var(--sky-pale);
-    padding: 8px 16px;
+    padding: 8px 18px;
     border-radius: 30px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 600;
     border: 1px solid var(--sky-pale);
+    z-index: 10;
   }
   .status-badge::before {
     content: '●';
@@ -182,42 +96,150 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
   }
-  @media (max-width: 768px) {
-    .ui-layer { padding: 12px; }
-    .card { padding: 12px 16px; }
-    .value { font-size: 1.3rem; }
-    .ai-card { min-width: 140px; }
-    .instructions { gap: 12px; }
+  .cards-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .card {
+    backdrop-filter: blur(12px);
+    background: rgba(28, 77, 141, 0.6);
+    border-radius: 16px;
+    border: 2px solid var(--blue-light);
+    box-shadow: 0 8px 32px rgba(15, 40, 84, 0.5);
+    padding: 24px 20px;
+    transition: all 0.4s ease;
+  }
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: var(--sky-pale);
+  }
+  .card.you-card {
+    border-left: 4px solid var(--sky-pale);
+  }
+  .card.ai-card {
+    border-right: 4px solid var(--sky-pale);
+    text-align: center;
+  }
+  .card.result-card {
+    border-left: 4px solid var(--sky-pale);
+    opacity: 0.4;
+    transform: translateY(5px);
+  }
+  .card.result-card.visible {
+    opacity: 1;
+    transform: translateY(0);
+    background: rgba(0, 120, 60, 0.4);
+    border-color: #90ee90;
+  }
+  .label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--sky-pale);
+    margin-bottom: 10px;
+    font-weight: 700;
+    opacity: 0.9;
+  }
+  .value {
+    font-size: 2rem;
+    font-weight: 900;
+    color: var(--white);
+  }
+  .value.waiting {
+    color: var(--sky-pale);
+    opacity: 0.5;
+    font-size: 1.5rem;
+    font-style: italic;
+  }
+  .instructions {
+    margin-top: 32px;
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .instr-card {
+    background: rgba(73, 136, 196, 0.25);
+    border-radius: 12px;
+    padding: 18px 28px;
+    text-align: center;
+    border: 2px solid var(--blue-light);
+    min-width: 120px;
+    transition: transform 0.3s ease;
+  }
+  .instr-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--sky-pale);
+  }
+  .instr-emoji {
+    font-size: 2.2rem;
+    margin-bottom: 6px;
+  }
+  .instr-text {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--sky-pale);
+  }
+  @media (max-width: 900px) {
+    .main-grid {
+      grid-template-columns: 1fr;
+    }
+    .cards-panel {
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .card {
+      min-width: 180px;
+    }
   }
 </style>
 </head>
 <body>
 <div class="page-wrap">
   <header>
-    <h1> ABDELL WILL ALWAYS WIN</h1>
-    <p class="subtitle">Show your hand THEN  ABDELL instantly plays the winning move</p>
+    <h1>ABDELL ALWAYS WINS ✊✋✌️</h1>
+    <p class="subtitle">Show your hand to the camera → ABDELL instantly plays the winning move every time</p>
   </header>
 
-  <div class="video-shell">
-    <video id="video" autoplay playsinline muted></video>
-    <canvas id="canvas"></canvas>
-    <div class="ui-layer">
+  <div class="main-grid">
+    <div class="video-shell">
       <div class="status-badge">LIVE</div>
-      
+      <video id="video" autoplay playsinline muted></video>
+      <canvas id="canvas"></canvas>
+    </div>
+
+    <div class="cards-panel">
       <div class="card you-card">
         <div class="label">Your Move</div>
         <div class="value waiting" id="yourMove">Waiting…</div>
       </div>
-      
+
       <div class="card ai-card">
-        <div class="label">ABDELL PLAY</div>
+        <div class="label">ABDELL Plays</div>
         <div class="value waiting" id="aiMove">—</div>
       </div>
-      
+
       <div class="card result-card" id="resultCard">
         <div class="label">Result</div>
-        <div class="value" id="resultText" style="font-size: 1.2rem;"></div>
+        <div class="value" id="resultText" style="font-size: 1.3rem;"></div>
       </div>
+    </div>
+  </div>
+
+  <div class="instructions">
+    <div class="instr-card">
+      <div class="instr-emoji">✊</div>
+      <div class="instr-text">Rock</div>
+    </div>
+    <div class="instr-card">
+      <div class="instr-emoji">✋</div>
+      <div class="instr-text">Paper</div>
+    </div>
+    <div class="instr-card">
+      <div class="instr-emoji">✌️</div>
+      <div class="instr-text">Scissors</div>
     </div>
   </div>
 </div>
@@ -309,12 +331,12 @@ function onResults(results) {
     yourMoveEl.classList.remove('waiting');
     aiMoveEl.textContent = aiMove;
     aiMoveEl.classList.remove('waiting');
-    resultText.textContent = `${aiMove} beats ${yourMove}`;
+    resultText.textContent = `${aiMove} beats ${yourMove} → ABDELL WINS!`;
     resultCard.classList.add('visible');
     return;
   }
 
-  yourMoveEl.textContent = yourMove === 'NO HAND' ? 'Waiting…' : yourMove;
+  yourMoveEl.textContent = yourMove === 'NO HAND' ? 'Show your hand…' : yourMove;
   yourMoveEl.classList.toggle('waiting', yourMove === 'NO HAND');
   aiMoveEl.textContent = '—';
   aiMoveEl.classList.add('waiting');
